@@ -1,3 +1,5 @@
+import toml
+
 # constants
 ORIGINAL_BINARY_PATH = "./.data/orig.bin"
 PATCHES_PATH = "./.data/patches"
@@ -12,8 +14,44 @@ def check_diff(): # compare get_current_binary_path binary with ORIGINAL_BINARY_
 def restore_binary(): # overwrites get_current_binary_path binary with ORIGINAL_BINARY_PATH
     pass
 
-def apply_patch(patch): # reads in patch data from patch file and writes it to get_current_binary_path
-    pass
+def apply_patch(patch):
+    """
+    Reads in patch data from a TOML file and applies it to the current binary.
+
+    Args:
+        patch (str): Path to the TOML patch file.
+    """
+    try:
+        # Load the TOML file
+        with open(patch, "r") as patch_file:
+            patch_data = toml.load(patch_file)
+
+        # Extract content section
+        name = patch_data.get("name", "Unnamed Patch")
+        description = patch_data.get("description", "No description provided.")
+        content = patch_data.get("content", {})
+        offsets = content.get("offsets", [])
+        bytes_to_write = content.get("bytes", [])
+
+        if not offsets or not bytes_to_write or len(offsets) != len(bytes_to_write):
+            raise ValueError("Invalid content format: offsets and bytes must be non-empty lists of the same length.")
+
+        # Open the current binary file in binary read/write mode
+        current_binary_path = get_current_binary_path()
+        with open(current_binary_path, "r+b") as binary_file:
+            for offset, byte_string in zip(offsets, bytes_to_write):
+                # Convert offset and byte string
+                offset = int(offset)  # Ensure offset is an integer
+                byte_data = bytes.fromhex(byte_string)
+
+                # Seek to the offset and write the byte data
+                binary_file.seek(offset)
+                binary_file.write(byte_data)
+
+        print(f"Patch '{name}' applied successfully: {description}")
+
+    except Exception as e:
+        print(f"Error applying patch: {e}")
 
 def display_patches(): # reads in title/description info from each patch file and displays it
     pass
@@ -65,7 +103,7 @@ def main():
             print("2 - edit it (this will modify your binary with the selected patch and then terminate for you to edit)")
             choice = input()
             if choice == 1:
-                # apply_patch
+                # apply_patch()
                 run_binary()
                 restore_binary()
                 break
