@@ -27,10 +27,17 @@ FRAME_WIDTH = 600
 FRAME_HEIGHT = 400
 
 def setInputFile(text):
-    file = open(text, "r")
-    print(file.read())
+    #file = open(text, "r")
+    #print(file.read())
     mem = getMemoryBlocks()
-    print(type(mem))
+    prog = getCurrentProgram()
+    mem2 = prog.getMemory()
+    print(type(mem2))
+    af = getAddressFactory()
+    addr = af.getAddress("00104d53")
+    b = mem2.getByte(addr)
+    print(b)
+
 
 def generateMainFrame():
     mainFrame = JFrame("Patch Pal")
@@ -55,3 +62,6 @@ def generateMainFrame():
 if __name__ == "__main__":
     mainFrame = generateMainFrame()
     mainFrame.setVisible(True)
+
+
+
