@@ -1,14 +1,3 @@
-#Example script taken from previous 451 offering
-#@author 
-#@category _NEW_
-#@keybinding 
-#@menupath 
-#@toolbar 
-#@runtime Jython
-
-
-#TODO Add User Code Here
-
 from javax.swing import JFrame
 from javax.swing import JButton
 from javax.swing import JComboBox
