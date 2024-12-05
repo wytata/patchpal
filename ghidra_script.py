@@ -1,56 +1,37 @@
 from javax.swing import JFrame
 from javax.swing import JButton
-from javax.swing import JComboBox
-from javax.swing import JLabel
-from javax.swing import SwingConstants
-from javax.swing import JTextField
 from javax.swing import JPanel
-
-from java.awt import Color
-from java.awt import Dimension
-
-from ghidra.program.model.symbol import RefType
-from ghidra.program.model.symbol import SymbolType
+from javax.swing import JTable
+from javax.swing import JScrollPane
 
 FRAME_WIDTH = 600
 FRAME_HEIGHT = 400
 
-def setInputFile(text):
-    #file = open(text, "r")
-    #print(file.read())
-    mem = getMemoryBlocks()
+def listPatches(parent_frame):
+    columns = ["Offset", "Instruction Change"]
     prog = getCurrentProgram()
     mem2 = prog.getMemory()
-    print(type(mem2))
-    af = getAddressFactory()
-    addr = af.getAddress("00104d53")
-    b = mem2.getByte(addr)
-    print(b)
+    fileBytes = mem2.getAllFileBytes()[0]
+    data = []
+    for i in range(fileBytes.getSize()):
+	if (fileBytes.getModifiedByte(i) != fileBytes.getOriginalByte(i)):
+            data.append([str(i), str(hex(fileBytes.getOriginalByte(i))) + " -> " + str(hex(fileBytes.getModifiedByte(i)))])
 
+    patchTable = JTable(data, columns)
+    patchTable.setBounds(100,100,200,300)
+    scrollPane = JScrollPane(patchTable)
+    parent_frame.add(scrollPane)
 
 def generateMainFrame():
     mainFrame = JFrame("Patch Pal")
-    mainFrame.setLayout(None)
     mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)
     mainFrame.setLocation(100, 100)
     mainFrame.setSize(FRAME_WIDTH, FRAME_HEIGHT)
-
-    def setInputFileHandler(event):
-        text = textInput.getText()
-        setInputFile(text)
-
-    textInput = JTextField(10)
-    textInput.setBounds(50, 50, 200, 40)
-    button = JButton("Set input file", actionPerformed=setInputFileHandler)
-    button.setBounds(250, 50, 200, 40)
-    mainFrame.add(textInput)
-    mainFrame.add(button)
+	
+    listPatches(mainFrame)
 
     return mainFrame
 
 if __name__ == "__main__":
     mainFrame = generateMainFrame()
     mainFrame.setVisible(True)
-
-
-
