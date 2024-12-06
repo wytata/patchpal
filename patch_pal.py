@@ -6,6 +6,7 @@ import shutil
 # constants
 ORIGINAL_BINARY_PATH = "./.data/orig.bin"
 PATCHES_PATH = "./.data/patches"
+user_binary = ""
 
 def get_current_binary_path():
     with open("./.data/path", "r") as file:
@@ -68,7 +69,7 @@ def setup():
         return
 
     try:
-        absolute_file_path = os.path.abspath(sys.argv[1])
+        absolute_file_path = os.path.abspath(user_binary)
         directory = os.path.join(os.path.dirname(absolute_file_path), ".data")
         os.mkdir(directory)
         os.mkdir(directory + "/patches")
@@ -92,7 +93,7 @@ def save_patch(patch_name: str, patches: list[tuple]): # compares ORIGINAL_BINAR
 
 def main():
     # grab args
-    binary_path = sys.argv[1]
+    user_binary = sys.argv[1]
     setup()
 
     # check diff, returns patch or null
