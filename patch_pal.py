@@ -8,8 +8,44 @@ def get_current_binary_path():
     with open("./.data/path", "r") as file:
         return file.read()
 
-def get_diff() -> list[tuple] | None: # compare get_current_binary_path binary with ORIGINAL_BINARY_PATH binary. returns true if difference present
-    pass
+def get_diff() -> list[tuple] | None:
+    """
+    Compares the binary contents of the current binary file and the original binary file.
+    
+    Returns:
+        list[tuple]: A list of tuples where each tuple contains the offset and 
+                     the pair of differing bytes (original, current).
+                     Example: [(offset1, (original_byte, current_byte)), ...]
+        None: If there are no differences.
+    """
+    try:
+        current_binary_path = get_current_binary_path()
+
+        # Open both files in binary read mode
+        with open(ORIGINAL_BINARY_PATH, "rb") as original_file, open(current_binary_path, "rb") as current_file:
+            original_data: bytes = original_file.read()
+            current_data: bytes = current_file.read()
+
+        # Compare byte by byte and collect differences
+        differences = []
+        max_len = max(len(original_data), len(current_data))
+
+        for offset in range(max_len):
+            original_byte: int = original_data[offset] if offset < len(original_data) else 0
+            current_byte: int = current_data[offset] if offset < len(current_data) else 0
+
+            if original_byte != current_byte:
+                differences.append(offset, f'{hex(current_byte & 0xFF).strip("0x"):0>2}')
+
+        return differences if len(differences) > 0 else None
+
+    except FileNotFoundError as e:
+        print(f"Error: File not found - {e}")
+        return None
+    except Exception as e:
+        print(f"Error while comparing binaries: {e}")
+        return None
+   
 
 def restore_binary(): # overwrites get_current_binary_path binary with ORIGINAL_BINARY_PATH
     pass
