@@ -13,7 +13,7 @@ def get_current_binary_path():
         return file.read()
 
 def get_diff() -> list[tuple] | None: # compare get_current_binary_path binary with ORIGINAL_BINARY_PATH binary. returns true if difference present
-    pass
+    pass 
 
 def restore_binary(): # overwrites get_current_binary_path binary with ORIGINAL_BINARY_PATH
     shutil.copy(ORIGINAL_BINARY_PATH, user_binary)
@@ -87,9 +87,24 @@ def setup():
     # copy current binary to ORIGINAL_BINARY_PATH
     # save path to current binary to "./.data/path"
 
-def save_patch(patch_name: str, patches: list[tuple]): # compares ORIGINAL_BINARY_PATH to get_current_binary_path, saving differences to new patch file
-    for patch in patches:
-        print(f"")
+def save_patch(patch_name: str, description: str, patches: list[tuple]) -> None: # compares ORIGINAL_BINARY_PATH to get_current_binary_path, saving differences to new patch file
+    file: str = patch_name.replace(' ', '-')
+    filepath = os.path.join(PATCHES_PATH, f"{file}.ps")
+
+    tmp: int = 15
+    hex_str: str = hex(tmp & 0xFF).strip('0x')
+
+    print(f"{hex_str:0>2}")
+
+    with open(filepath, "a+") as patch_file:
+        patch_file.write(f'name = "{patch_name}"\n')
+        patch_file.write(f'description = "{description}"\n')
+        patch_file.write('\n')
+        patch_file.write("[content]\n")
+
+        offsets, bytes = zip(*patches)
+        patch_file.write(f"offsets = [{', '.join(offsets)}]\n")
+        patch_file.write(f"bytes = [{', '.join(bytes)}]\n")
 
 def main():
     # grab args
