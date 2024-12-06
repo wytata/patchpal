@@ -1,12 +1,12 @@
 import toml
+import os
+import sys
+import shutil
 
 # constants
 ORIGINAL_BINARY_PATH = "./.data/orig.bin"
 PATCHES_PATH = "./.data/patches"
-
-def get_current_binary_path():
-    with open("./.data/path", "r") as file:
-        return file.read()
+user_binary = ""
 
 def get_diff() -> list[tuple] | None:
     """
@@ -19,7 +19,7 @@ def get_diff() -> list[tuple] | None:
         None: If there are no differences.
     """
     try:
-        current_binary_path = get_current_binary_path()
+        current_binary_path = user_binary()
 
         # Open both files in binary read mode
         with open(ORIGINAL_BINARY_PATH, "rb") as original_file, open(current_binary_path, "rb") as current_file:
@@ -48,7 +48,7 @@ def get_diff() -> list[tuple] | None:
    
 
 def restore_binary(): # overwrites get_current_binary_path binary with ORIGINAL_BINARY_PATH
-    pass
+    shutil.copy(ORIGINAL_BINARY_PATH, user_binary)
 
 def apply_patch(patch):
     """
@@ -73,7 +73,7 @@ def apply_patch(patch):
             raise ValueError("Invalid content format: offsets and bytes must be non-empty lists of the same length.")
 
         # Open the current binary file in binary read/write mode
-        current_binary_path = get_current_binary_path()
+        current_binary_path = user_binary
         with open(current_binary_path, "r+b") as binary_file:
             for offset, byte_string in zip(offsets, bytes_to_write):
                 # Convert offset and byte string
@@ -93,10 +93,24 @@ def display_patches(): # reads in title/description info from each patch file an
     pass
 
 def run_binary():
-    proc = subproccess.Popen([get_current_binary_path()])
+    proc = subproccess.Popen([user_binary()])
     proc.wait()
 
-def setup(): 
+def setup():
+    if os.path.isdir(".data"):
+        return
+
+    try:
+        absolute_file_path = os.path.abspath(user_binary)
+        directory = os.path.join(os.path.dirname(absolute_file_path), ".data")
+        os.mkdir(directory)
+        os.mkdir(directory + "/patches")
+        original_bin_path = directory + "/orig.bin"
+        shutil.copy(absolute_file_path, original_bin_path)
+        sys.exit(0)
+
+    except Exception as e:
+        print(e)
     # check if .data directory has been set up yet
     # if it has, return
     # if not:
@@ -104,13 +118,31 @@ def setup():
     # ask user for path to current binary
     # copy current binary to ORIGINAL_BINARY_PATH
     # save path to current binary to "./.data/path"
-    pass
 
-def save_patch(patch_name: str, patches: list[tuple]): # compares ORIGINAL_BINARY_PATH to get_current_binary_path, saving differences to new patch file
-    for patch in patches:
-        print(f"")
+def save_patch(patch_name: str, description: str, patches: list[tuple]) -> None: # compares ORIGINAL_BINARY_PATH to get_current_binary_path, saving differences to new patch file
+    file: str = patch_name.replace(' ', '-')
+    filepath = os.path.join(PATCHES_PATH, f"{file}.ps")
+
+    tmp: int = 15
+    hex_str: str = hex(tmp & 0xFF).strip('0x')
+
+    print(f"{hex_str:0>2}")
+
+    with open(filepath, "a+") as patch_file:
+        patch_file.write(f'name = "{patch_name}"\n')
+        patch_file.write(f'description = "{description}"\n')
+        patch_file.write('\n')
+        patch_file.write("[content]\n")
+
+        offsets, bytes = zip(*patches)
+        patch_file.write(f"offsets = [{', '.join(offsets)}]\n")
+        patch_file.write(f"bytes = [{', '.join(bytes)}]\n")
 
 def main():
+    # grab args
+    if (argc != 2):
+        print("Please provide the path to your binary as a command line argument.");
+    user_binary = sys.argv[1]
     setup()
 
     # check diff, returns patch or null
@@ -123,10 +155,13 @@ def main():
         match int(input()):
             case 1:
                 # save patch
-                # overwrite current binary with original binary. restore_binary()
+                save_patch(get_diff())
+                # overwrite current binary with original binary. 
+                restore_binary()
                 break
             case 2:
-                # overwrite current binary with original binary. restore_binary()
+                # overwrite current binary with original binary. 
+                restore_binary()
                 break
             case _:
                 print("Please enter a valid choice.")
