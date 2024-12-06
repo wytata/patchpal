@@ -90,7 +90,19 @@ def apply_patch(patch):
         print(f"Error applying patch: {e}")
 
 def display_patches(): # reads in title/description info from each patch file and displays it
-    pass
+    for root, dirs, files in os.walk(PATCHES_PATH):
+        for file in files:
+            file_path = os.path.join(root, file)
+            # Load the TOML file
+            with open(file, "r") as patch_file:
+                patch_data = toml.load(patch_file)
+
+            # Extract content section
+            name = patch_data.get("name", "Unnamed Patch")
+            description = patch_data.get("description", "No description provided.")
+
+            print(name + "\n" + description + "\n\n-----\n\n")
+
 
 def run_binary():
     proc = subproccess.Popen([user_binary()])
@@ -140,7 +152,7 @@ def save_patch(patch_name: str, description: str, patches: list[tuple]) -> None:
 
 def main():
     # grab args
-    if (argc != 2):
+    if (len(sys.argv) != 2):
         print("Please provide the path to your binary as a command line argument.");
     user_binary = sys.argv[1]
     setup()
