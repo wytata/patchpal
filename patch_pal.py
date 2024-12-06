@@ -120,6 +120,7 @@ def setup():
         os.mkdir(directory + "/patches")
         original_bin_path = directory + "/orig.bin"
         shutil.copy(absolute_file_path, original_bin_path)
+        print("Your patch pal project directory has been set up. You can now create patches!")
 
     except Exception as e:
         print(e)
@@ -147,26 +148,25 @@ def main():
     user_binary = sys.argv[1]
     setup()
 
-    # check diff, returns patch or null
-
-    # if there is a diff
-    while True:
-        print("It looks like you have modified the binary as it does not match the original. What would you like to do?")
-        print("1 - Save the modifications as a new patch and revert the changes")
-        print("2 - Revert the changes")
-        match int(input()):
-            case 1:
-                # save patch
-                save_patch(get_diff())
-                # overwrite current binary with original binary. 
-                restore_binary()
-                break
-            case 2:
-                # overwrite current binary with original binary. 
-                restore_binary()
-                break
-            case _:
-                print("Please enter a valid choice.")
+    diffs = get_diff()
+    if diffs:
+        while True:
+            print("It looks like you have modified the binary as it does not match the original. What would you like to do?")
+            print("1 - Save the modifications as a new patch and revert the changes")
+            print("2 - Revert the changes")
+            match int(input()):
+                case 1:
+                    # save patch
+                    save_patch(get_diff())
+                    # overwrite current binary with original binary. 
+                    restore_binary()
+                    break
+                case 2:
+                    # overwrite current binary with original binary. 
+                    restore_binary()
+                    break
+                case _:
+                    print("Please enter a valid choice.")
 
     while True:
         # display patches
