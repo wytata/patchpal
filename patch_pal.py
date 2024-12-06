@@ -120,17 +120,9 @@ def setup():
         os.mkdir(directory + "/patches")
         original_bin_path = directory + "/orig.bin"
         shutil.copy(absolute_file_path, original_bin_path)
-        sys.exit(0)
 
     except Exception as e:
         print(e)
-    # check if .data directory has been set up yet
-    # if it has, return
-    # if not:
-    # create directory structure
-    # ask user for path to current binary
-    # copy current binary to ORIGINAL_BINARY_PATH
-    # save path to current binary to "./.data/path"
 
 def save_patch(patch_name: str, description: str, patches: list[tuple]) -> None: # compares ORIGINAL_BINARY_PATH to get_current_binary_path, saving differences to new patch file
     file: str = patch_name.replace(' ', '-')
