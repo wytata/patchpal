@@ -175,6 +175,7 @@ def main():
 
     while True:
         # display patches
+        display_patches()
         # select patch
         while True:
             print("What do you want to do with this patch?")
