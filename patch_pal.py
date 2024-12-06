@@ -92,7 +92,7 @@ def apply_patch(patch):
 
 def display_patches(): # reads in title/description info from each patch file and displays it
     for root, dirs, files in os.walk(PATCHES_PATH):
-        for file in files:
+        for i, file in enumerate(files):
             file_path = os.path.join(root, file)
             # Load the TOML file
             with open(file, "r") as patch_file:
@@ -102,7 +102,7 @@ def display_patches(): # reads in title/description info from each patch file an
             name = patch_data.get("name", "Unnamed Patch")
             description = patch_data.get("description", "No description provided.")
 
-            print(name + "\n" + description + "\n\n-----\n\n")
+            print((i + 1) + ". " + name + "\n" + description + "\n\n-----\n\n")
 
 
 def run_binary():
@@ -177,6 +177,7 @@ def main():
         # display patches
         display_patches()
         # select patch
+        patch_choice = input("Input a number to select a patch: ")
         while True:
             print("What do you want to do with this patch?")
             print("1 - run it")
