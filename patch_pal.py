@@ -147,6 +147,8 @@ def save_patch(patch_name: str, description: str, patches: list[tuple]) -> None:
         patch_file.write(f"bytes = [{', '.join(bytes)}]\n")
 
 def main():
+
+    global user_binary
     # grab args
     if (len(sys.argv) != 2):
         print("Please provide the path to your binary as a command line argument.")
