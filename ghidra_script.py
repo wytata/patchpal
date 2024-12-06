@@ -6,6 +6,7 @@ from javax.swing import JLabel
 from javax.swing import JTextField
 from javax.swing import JScrollPane
 from javax.swing import BoxLayout
+from javax.swing import JOptionPane
 from javax.swing import SwingConstants
 from java.awt import Dimension
 import os
@@ -30,10 +31,17 @@ def setup(dir, user_binary):
     except Exception as e:
         print(e)
 
-def writeTomlFile(name, description, data, path):
+def writeTomlFile(name, description, data, path, frame):
     project_dir = os.path.dirname(path)
     setup(project_dir, path)
     filename = project_dir + "/.data/patches/" + name + ".ps"
+    if (os.path.exists(filename)):
+        error_message = "Patch file with name " + name + " already exists."
+        JOptionPane.showMessageDialog(frame, error_message)
+        #print(error_message)
+        #error_label = JLabel(error_message)
+        #panel.add(error_label)
+        return
     offsets = [modification[0] for modification in data]
     bytes = [modification[1].split("->")[1].strip().strip("0x") for modification in data]
     output_bytes = ["'" + "0" + bytes[i] + "'" if len(bytes[i]) == 1 else "'" + bytes[i] + "'" for i in range(len(bytes))]
@@ -51,7 +59,7 @@ def acceptAllPatches(data, prog):
     patchExportFrame = JFrame("Export Patches")
     patchExportFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)
     patchExportFrame.setLocation(300, 300)
-    patchExportFrame.setSize(300, 150)
+    patchExportFrame.setSize(300, 250)
     patchExportFrame.setLayout(None)
  
     panel = JPanel()
@@ -82,7 +90,7 @@ def acceptAllPatches(data, prog):
     def exportPatchesHandler(event):
     	name = nameInput.getText()
     	description = descriptionInput.getText()
-	writeTomlFile(name, description, data, prog.getExecutablePath())
+	writeTomlFile(name, description, data, prog.getExecutablePath(), patchExportFrame)
 
     exportButton = JButton("Export Patches", actionPerformed=exportPatchesHandler)
     exportButton.setAlignmentX(panel.CENTER_ALIGNMENT)
