@@ -9,17 +9,36 @@ from javax.swing import BoxLayout
 from javax.swing import SwingConstants
 from java.awt import Dimension
 import os
+import shutil
 
 FRAME_WIDTH = 800
 FRAME_HEIGHT = 600
 
+def setup(dir, user_binary):
+    if os.path.isdir(dir + "/.data"):
+        return
+
+    try:
+        absolute_file_path = os.path.abspath(user_binary)
+        directory = os.path.join(os.path.dirname(absolute_file_path), ".data")
+        os.mkdir(directory)
+        os.mkdir(directory + "/patches")
+        original_bin_path = directory + "/orig.bin"
+        shutil.copy(absolute_file_path, original_bin_path)
+        print("Your patch pal project directory has been set up. You can now create patches!")
+
+    except Exception as e:
+        print(e)
+
 def writeTomlFile(name, description, data, path):
-    filename = os.path.dirname(path) + "/.data/patches/" + name + ".ps"
+    project_dir = os.path.dirname(path)
+    setup(project_dir, path)
+    filename = project_dir + "/.data/patches/" + name + ".ps"
     offsets = [modification[0] for modification in data]
     bytes = [modification[1].split("->")[1].strip().strip("0x") for modification in data]
     output_bytes = ["'" + "0" + bytes[i] + "'" if len(bytes[i]) == 1 else "'" + bytes[i] + "'" for i in range(len(bytes))]
     
-    output_file = open(filename, "a+")
+    output_file = open(filename.replace(" ", "-"), "a+")
     output_file.write("name = \"" + name + "\"\n")
     output_file.write("description = \"" + description + "\"\n\n")
     output_file.write("[content]\n")
@@ -117,4 +136,3 @@ def generateMainFrame():
 if __name__ == "__main__":
     mainFrame = generateMainFrame()
     mainFrame.setVisible(True)
-
