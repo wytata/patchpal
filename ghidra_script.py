@@ -1,3 +1,4 @@
+from javax.swing import JFrame
 from javax.swing import JButton
 from javax.swing import JPanel
 from javax.swing import JTable
@@ -101,14 +102,6 @@ def listPatches(parent_frame):
     acceptAllButton.setBounds(0, 0, 150, 50)
     acceptAllButton.setAlignmentX(panel.CENTER_ALIGNMENT)
     panel.add(acceptAllButton)
-
-    def exportPatches(event):
-	print("This function is still under development.")
-
-    acceptPatchesButton = JButton("Accept Chosen Patches", actionPerformed=exportPatches)
-
-    acceptPatchesButton.setAlignmentX(panel.CENTER_ALIGNMENT)
-    panel.add(acceptPatchesButton)
 
 
 def generateMainFrame():
