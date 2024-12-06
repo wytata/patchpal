@@ -125,13 +125,14 @@ def setup():
     except Exception as e:
         print(e)
 
-def save_patch(patch_name: str, description: str, patches: list[tuple]) -> None: # compares ORIGINAL_BINARY_PATH to get_current_binary_path, saving differences to new patch file
+def save_patch(patch_name: str, description: str | None, patches: list[tuple]) -> None: # compares ORIGINAL_BINARY_PATH to get_current_binary_path, saving differences to new patch file
     file: str = patch_name.replace(' ', '-')
     filepath = os.path.join(PATCHES_PATH, f"{file}.ps")
 
     with open(filepath, "a+") as patch_file:
         patch_file.write(f'name = "{patch_name}"\n')
-        patch_file.write(f'description = "{description}"\n')
+        if (description): 
+            patch_file.write(f'description = "{description}"\n')
         patch_file.write('\n')
         patch_file.write("[content]\n")
 
@@ -157,7 +158,11 @@ def main():
             match int(input()):
                 case 1:
                     # save patch
-                    save_patch(diffs)
+                    name: str = input("What would you like to name this patch? ")
+                    opt_description: str = input("Message (optional) ")
+                    description: str | None = opt_description if opt_description != "" else None
+
+                    save_patch(name, description, diffs)
                     # overwrite current binary with original binary. 
                     restore_binary()
                     break
