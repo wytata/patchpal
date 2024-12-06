@@ -1,4 +1,7 @@
 import toml
+import os
+import sys
+import shutil
 
 # constants
 ORIGINAL_BINARY_PATH = "./.data/orig.bin"
@@ -60,7 +63,21 @@ def run_binary():
     proc = subproccess.Popen([get_current_binary_path()])
     proc.wait()
 
-def setup(): 
+def setup():
+    if os.path.isdir(".data"):
+        return
+
+    try:
+        absolute_file_path = os.path.abspath(sys.argv[1])
+        directory = os.path.join(os.path.dirname(absolute_file_path), ".data")
+        os.mkdir(directory)
+        os.mkdir(directory + "/patches")
+        original_bin_path = directory + "/orig.bin"
+        shutil.copy(absolute_file_path, original_bin_path)
+        sys.exit(0)
+
+    except Exception as e:
+        print(e)
     # check if .data directory has been set up yet
     # if it has, return
     # if not:
@@ -68,13 +85,14 @@ def setup():
     # ask user for path to current binary
     # copy current binary to ORIGINAL_BINARY_PATH
     # save path to current binary to "./.data/path"
-    pass
 
 def save_patch(patch_name: str, patches: list[tuple]): # compares ORIGINAL_BINARY_PATH to get_current_binary_path, saving differences to new patch file
     for patch in patches:
         print(f"")
 
 def main():
+    # grab args
+    binary_path = sys.argv[1]
     setup()
 
     # check diff, returns patch or null
