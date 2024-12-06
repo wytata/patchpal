@@ -8,7 +8,7 @@ def get_current_binary_path():
     with open("./.data/path", "r") as file:
         return file.read()
 
-def check_diff(): # compare get_current_binary_path binary with ORIGINAL_BINARY_PATH binary. returns true if difference present
+def get_diff() -> list[tuple] | None: # compare get_current_binary_path binary with ORIGINAL_BINARY_PATH binary. returns true if difference present
     pass
 
 def restore_binary(): # overwrites get_current_binary_path binary with ORIGINAL_BINARY_PATH
@@ -70,8 +70,9 @@ def setup():
     # save path to current binary to "./.data/path"
     pass
 
-def save_patch(patch_name): # compares ORIGINAL_BINARY_PATH to get_current_binary_path, saving differences to new patch file
-    pass
+def save_patch(patch_name: str, patches: list[tuple]): # compares ORIGINAL_BINARY_PATH to get_current_binary_path, saving differences to new patch file
+    for patch in patches:
+        print(f"")
 
 def main():
     setup()
@@ -83,16 +84,16 @@ def main():
         print("It looks like you have modified the binary as it does not match the original. What would you like to do?")
         print("1 - Save the modifications as a new patch and revert the changes")
         print("2 - Revert the changes")
-        choice = input()
-        if choice == 1:
-            # save patch
-            # overwrite current binary with original binary. restore_binary()
-            break
-        elif choice == 2:
-            # overwrite current binary with original binary. restore_binary()
-            break
-        else:
-            print("Please enter a valid choice.")
+        match int(input()):
+            case 1:
+                # save patch
+                # overwrite current binary with original binary. restore_binary()
+                break
+            case 2:
+                # overwrite current binary with original binary. restore_binary()
+                break
+            case _:
+                print("Please enter a valid choice.")
 
     while True:
         # display patches
