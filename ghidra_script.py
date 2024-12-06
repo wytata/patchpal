@@ -1,4 +1,3 @@
-from javax.swing import JFrame
 from javax.swing import JButton
 from javax.swing import JPanel
 from javax.swing import JTable
@@ -8,11 +7,27 @@ from javax.swing import JScrollPane
 from javax.swing import BoxLayout
 from javax.swing import SwingConstants
 from java.awt import Dimension
+import os
 
 FRAME_WIDTH = 800
 FRAME_HEIGHT = 600
 
-def acceptAllPatches(event):
+def writeTomlFile(name, description, data, path):
+    filename = os.path.dirname(path) + "/.data/patches/" + name + ".ps"
+    offsets = [modification[0] for modification in data]
+    bytes = [modification[1].split("->")[1].strip().strip("0x") for modification in data]
+    output_bytes = ["'" + "0" + bytes[i] + "'" if len(bytes[i]) == 1 else "'" + bytes[i] + "'" for i in range(len(bytes))]
+    
+    output_file = open(filename, "a+")
+    output_file.write("name = \"" + name + "\"\n")
+    output_file.write("description = \"" + description + "\"\n\n")
+    output_file.write("[content]\n")
+    output_file.write("offsets = [" + ', '.join(offsets) + "]\n") 
+    output_file.write("bytes = [" + ', '.join(output_bytes) + "]\n")
+    output_file.close()
+
+
+def acceptAllPatches(data, prog):
     patchExportFrame = JFrame("Export Patches")
     patchExportFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE)
     patchExportFrame.setLocation(300, 300)
@@ -43,8 +58,12 @@ def acceptAllPatches(event):
     descriptionInput.setAlignmentX(panel.CENTER_ALIGNMENT)
     panel.add(descriptionInput)
 
+
     def exportPatchesHandler(event):
-        print("Hello world")
+    	name = nameInput.getText()
+    	description = descriptionInput.getText()
+	writeTomlFile(name, description, data, prog.getExecutablePath())
+
     exportButton = JButton("Export Patches", actionPerformed=exportPatchesHandler)
     exportButton.setAlignmentX(panel.CENTER_ALIGNMENT)
     panel.add(exportButton)
@@ -56,12 +75,13 @@ def acceptAllPatches(event):
 def listPatches(parent_frame):
     columns = ["Offset", "Instruction Change"]
     prog = getCurrentProgram()
+    print(prog.getExecutablePath())
     mem2 = prog.getMemory()
     fileBytes = mem2.getAllFileBytes()[0]
     data = []
     for i in range(fileBytes.getSize()):
-	if (fileBytes.getModifiedByte(i) != fileBytes.getOriginalByte(i)):
-            data.append([str(i), str(hex(fileBytes.getOriginalByte(i))) + " -> " + str(hex(fileBytes.getModifiedByte(i)))])
+	if ((fileBytes.getModifiedByte(i) & 0xFF) != (fileBytes.getOriginalByte(i) & 0xFF)):
+            data.append([str(i), str(hex(fileBytes.getOriginalByte(i) & 0xFF)) + " -> " + str(hex(fileBytes.getModifiedByte(i) & 0xFF))])
 
     patchTable = JTable(data, columns)
     patchTable.setRowSelectionAllowed(True)
@@ -74,13 +94,17 @@ def listPatches(parent_frame):
     panel.add(scrollPane)
     parent_frame.add(panel)
 
-    acceptAllButton = JButton("Accept All", actionPerformed=acceptAllPatches)
+    def acceptAllHandler(event):
+        acceptAllPatches(data, prog)
+
+    acceptAllButton = JButton("Accept All", actionPerformed=acceptAllHandler)
     acceptAllButton.setBounds(0, 0, 150, 50)
     acceptAllButton.setAlignmentX(panel.CENTER_ALIGNMENT)
     panel.add(acceptAllButton)
 
     def exportPatches(event):
 	print("This function is still under development.")
+
     acceptPatchesButton = JButton("Accept Chosen Patches", actionPerformed=exportPatches)
 
     acceptPatchesButton.setAlignmentX(panel.CENTER_ALIGNMENT)
@@ -100,3 +124,4 @@ def generateMainFrame():
 if __name__ == "__main__":
     mainFrame = generateMainFrame()
     mainFrame.setVisible(True)
+
