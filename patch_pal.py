@@ -108,10 +108,13 @@ def main():
         match int(input()):
             case 1:
                 # save patch
-                # overwrite current binary with original binary. restore_binary()
+                save_patch(get_diff())
+                # overwrite current binary with original binary. 
+                restore_binary()
                 break
             case 2:
-                # overwrite current binary with original binary. restore_binary()
+                # overwrite current binary with original binary. 
+                restore_binary()
                 break
             case _:
                 print("Please enter a valid choice.")
