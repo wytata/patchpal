@@ -2,6 +2,7 @@ import toml
 import os
 import sys
 import shutil
+import subprocess
 
 # constants
 ORIGINAL_BINARY_PATH = "./.data/orig.bin"
@@ -19,7 +20,7 @@ def get_diff() -> list[tuple] | None:
         None: If there are no differences.
     """
     try:
-        current_binary_path = user_binary()
+        current_binary_path = user_binary
 
         # Open both files in binary read mode
         with open(ORIGINAL_BINARY_PATH, "rb") as original_file, open(current_binary_path, "rb") as current_file:
@@ -105,7 +106,7 @@ def display_patches(): # reads in title/description info from each patch file an
 
 
 def run_binary():
-    proc = subproccess.Popen([user_binary()])
+    proc = subprocess.Popen([user_binary, *sys.argv[2:]])
     proc.wait()
 
 def setup():
@@ -135,11 +136,6 @@ def save_patch(patch_name: str, description: str, patches: list[tuple]) -> None:
     file: str = patch_name.replace(' ', '-')
     filepath = os.path.join(PATCHES_PATH, f"{file}.ps")
 
-    tmp: int = 15
-    hex_str: str = hex(tmp & 0xFF).strip('0x')
-
-    print(f"{hex_str:0>2}")
-
     with open(filepath, "a+") as patch_file:
         patch_file.write(f'name = "{patch_name}"\n')
         patch_file.write(f'description = "{description}"\n')
@@ -153,7 +149,7 @@ def save_patch(patch_name: str, description: str, patches: list[tuple]) -> None:
 def main():
     # grab args
     if (len(sys.argv) != 2):
-        print("Please provide the path to your binary as a command line argument.");
+        print("Please provide the path to your binary as a command line argument.")
     user_binary = sys.argv[1]
     setup()
 
