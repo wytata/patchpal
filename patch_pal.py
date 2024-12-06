@@ -93,6 +93,8 @@ def save_patch(patch_name: str, patches: list[tuple]): # compares ORIGINAL_BINAR
 
 def main():
     # grab args
+    if (argc != 2):
+        print("Please provide the path to your binary as a command line argument.");
     user_binary = sys.argv[1]
     setup()
 
