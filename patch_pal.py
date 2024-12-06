@@ -148,7 +148,7 @@ def main():
     user_binary = sys.argv[1]
     setup()
 
-    diffs = get_diff()
+    diffs: list[tuple] | None = get_diff()
     if diffs:
         while True:
             print("It looks like you have modified the binary as it does not match the original. What would you like to do?")
@@ -157,7 +157,7 @@ def main():
             match int(input()):
                 case 1:
                     # save patch
-                    save_patch(get_diff())
+                    save_patch(diffs)
                     # overwrite current binary with original binary. 
                     restore_binary()
                     break
