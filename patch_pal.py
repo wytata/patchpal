@@ -112,7 +112,14 @@ def display_patches(): # reads in title/description info from each patch file an
 
             print(str(i + 1) + ". " + name + "\n" + description + "\n\n-----\n\n")
 
-    patch_choice = int(input("Input a number to select a patch: "))
+    patch_choice = input("Input a number to select a patch: ")
+    if patch_choice == 'q':
+        exit()
+    while not patch_choice.isnumeric():
+        patch_choice = input("Input a number to select a patch: ")
+        if patch_choice == 'q':
+            exit()
+
     try:
         return patch_choices[patch_choice-1]
     except Exception as e:
@@ -173,8 +180,8 @@ def main():
             print("It looks like you have modified the binary as it does not match the original. What would you like to do?")
             print("1 - Save the modifications as a new patch and revert the changes")
             print("2 - Revert the changes")
-            match int(input()):
-                case 1:
+            match input():
+                case '1':
                     # save patch
                     name: str = input("What would you like to name this patch? ")
                     opt_description: str = input("Message (optional) ")
@@ -184,12 +191,14 @@ def main():
                     # overwrite current binary with original binary. 
                     restore_binary()
                     break
-                case 2:
+                case '2':
                     # overwrite current binary with original binary. 
                     restore_binary()
                     break
                 case _:
                     print("Please enter a valid choice.")
+
+    print("\n\nWelcome to PatchPal!\n\nHere are your current patches:\n")
 
     while True:
         # display patches
@@ -207,6 +216,8 @@ def main():
                 break
             elif choice == '2':
                 apply_patch(patch_file)
+                exit()
+            elif choice == "q":
                 exit()
             else:
                 print("Please enter a valid choice.")
