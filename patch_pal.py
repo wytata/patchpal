@@ -50,7 +50,7 @@ def get_diff() -> list[tuple] | None:
    
 
 def restore_binary(): # overwrites get_current_binary_path binary with ORIGINAL_BINARY_PATH
-    shutil.copy(ORIGINAL_BINARY_PATH, user_binary)
+    shutil.copy(user_working_directory + ORIGINAL_BINARY_PATH, user_binary)
 
 def apply_patch(patch):
     """
