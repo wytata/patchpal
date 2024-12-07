@@ -36,7 +36,7 @@ def get_diff() -> list[tuple] | None:
             current_byte: int = current_data[offset] if offset < len(current_data) else 0
 
             if original_byte != current_byte:
-                differences.append(offset, f'{hex(current_byte & 0xFF).strip("0x"):0>2}')
+                differences.append((offset, f'{hex(current_byte & 0xFF).strip("0x"):0>2}'))
 
         return differences if len(differences) > 0 else None
 
