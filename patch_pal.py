@@ -24,7 +24,7 @@ def get_diff() -> list[tuple] | None:
         current_binary_path = user_binary
 
         # Open both files in binary read mode
-        with open(ORIGINAL_BINARY_PATH, "rb") as original_file, open(current_binary_path, "rb") as current_file:
+        with open(user_working_directory + ORIGINAL_BINARY_PATH, "rb") as original_file, open(current_binary_path, "rb") as current_file:
             original_data: bytes = original_file.read()
             current_data: bytes = current_file.read()
 
