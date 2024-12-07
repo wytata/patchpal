@@ -96,9 +96,11 @@ def display_patches(): # reads in title/description info from each patch file an
         print("It looks like you don't yet have any patches. Get to reversing!")
         sys.exit(1)
 
+    patch_choices = {}
     for root, dirs, files in os.walk(user_working_directory + PATCHES_PATH):
         for i, file in enumerate(files):
             file_path = os.path.join(root, file)
+            patch_choices[i] = file_path
             # Load the TOML file
             with open(file_path, "r") as patch_file:
                 patch_data = toml.load(patch_file)
@@ -108,6 +110,13 @@ def display_patches(): # reads in title/description info from each patch file an
             description = patch_data.get("description", "No description provided.")
 
             print(str(i + 1) + ". " + name + "\n" + description + "\n\n-----\n\n")
+
+    print(patch_choices)
+    patch_choice = int(input("Input a number to select a patch: "))
+    try:
+        return patch_choices[patch_choice]
+    except Exception as e:
+        return None
 
 
 def run_binary():
@@ -184,9 +193,10 @@ def main():
 
     while True:
         # display patches
-        display_patches()
+        patch_file = display_patches()
+        print(patch_file)
+        return
         # select patch
-        patch_choice = input("Input a number to select a patch: ")
         while True:
             print("What do you want to do with this patch?")
             print("1 - run it")
