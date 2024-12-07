@@ -61,6 +61,7 @@ def apply_patch(patch):
     """
     try:
         # Load the TOML file
+        patch_data = None
         with open(patch, "r") as patch_file:
             patch_data = toml.load(patch_file)
 
