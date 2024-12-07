@@ -91,6 +91,10 @@ def apply_patch(patch):
         print(f"Error applying patch: {e}")
 
 def display_patches(): # reads in title/description info from each patch file and displays it
+    if os.listdir(PATCHES_PATH) == []:
+        print("It looks like you don't yet have any patches. Get to reversing!")
+        sys.exit(1)
+
     for root, dirs, files in os.walk(PATCHES_PATH):
         for i, file in enumerate(files):
             file_path = os.path.join(root, file)
@@ -144,8 +148,8 @@ def main():
 
     global user_binary
     # grab args
-    if (len(sys.argv) != 2):
-        print("Please provide the path to your binary as a command line argument.")
+    if len(sys.argv) != 2 or sys.argv[1] == "-h":
+        print("Usage: patchpal <binary_file_to_reverse>")
     user_binary = sys.argv[1]
     setup()
 
