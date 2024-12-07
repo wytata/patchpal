@@ -194,8 +194,6 @@ def main():
     while True:
         # display patches
         patch_file = display_patches()
-        print(patch_file)
-        return
         # select patch
         while True:
             print("What do you want to do with this patch?")
@@ -203,12 +201,12 @@ def main():
             print("2 - edit it (this will modify your binary with the selected patch and then terminate for you to edit)")
             choice = input()
             if choice == 1:
-                # apply_patch()
+                apply_patch(patch_file)
                 run_binary()
                 restore_binary()
                 break
             elif choice == 2:
-                # apply_patch
+                apply_patch(patch_file)
                 exit()
             else:
                 print("Please enter a valid choice.")
