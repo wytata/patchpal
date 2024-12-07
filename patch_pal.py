@@ -111,7 +111,6 @@ def display_patches(): # reads in title/description info from each patch file an
 
             print(str(i + 1) + ". " + name + "\n" + description + "\n\n-----\n\n")
 
-    print(patch_choices)
     patch_choice = int(input("Input a number to select a patch: "))
     try:
         return patch_choices[patch_choice]
