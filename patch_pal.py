@@ -200,12 +200,12 @@ def main():
             print("1 - run it")
             print("2 - edit it (this will modify your binary with the selected patch and then terminate for you to edit)")
             choice = input()
-            if choice == 1:
+            if choice == '1':
                 apply_patch(patch_file)
                 run_binary()
                 restore_binary()
                 break
-            elif choice == 2:
+            elif choice == '2':
                 apply_patch(patch_file)
                 exit()
             else:
