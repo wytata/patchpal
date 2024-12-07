@@ -141,7 +141,7 @@ def save_patch(patch_name: str, description: str | None, patches: list[tuple]) -
         patch_file.write("[content]\n")
 
         offsets, bytes = zip(*patches)
-        patch_file.write(f"offsets = [{', '.join(offsets)}]\n")
+        patch_file.write(f"offsets = [{', '.join([str(off) for off in offsets])}]\n")
         patch_file.write(f"bytes = [{', '.join(bytes)}]\n")
 
 def main():
