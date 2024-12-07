@@ -5,9 +5,10 @@ import shutil
 import subprocess
 
 # constants
-ORIGINAL_BINARY_PATH = "./.data/orig.bin"
-PATCHES_PATH = "./.data/patches"
+ORIGINAL_BINARY_PATH = "/.data/orig.bin"
+PATCHES_PATH = "/.data/patches"
 user_binary = ""
+user_working_directory = ""
 
 def get_diff() -> list[tuple] | None:
     """
@@ -91,22 +92,22 @@ def apply_patch(patch):
         print(f"Error applying patch: {e}")
 
 def display_patches(): # reads in title/description info from each patch file and displays it
-    if os.listdir(PATCHES_PATH) == []:
+    if os.listdir(user_working_directory + PATCHES_PATH) == []:
         print("It looks like you don't yet have any patches. Get to reversing!")
         sys.exit(1)
 
-    for root, dirs, files in os.walk(PATCHES_PATH):
+    for root, dirs, files in os.walk(user_working_directory + PATCHES_PATH):
         for i, file in enumerate(files):
             file_path = os.path.join(root, file)
             # Load the TOML file
-            with open(file, "r") as patch_file:
+            with open(file_path, "r") as patch_file:
                 patch_data = toml.load(patch_file)
 
             # Extract content section
             name = patch_data.get("name", "Unnamed Patch")
             description = patch_data.get("description", "No description provided.")
 
-            print((i + 1) + ". " + name + "\n" + description + "\n\n-----\n\n")
+            print(str(i + 1) + ". " + name + "\n" + description + "\n\n-----\n\n")
 
 
 def run_binary():
@@ -131,7 +132,7 @@ def setup():
 
 def save_patch(patch_name: str, description: str | None, patches: list[tuple]) -> None: # compares ORIGINAL_BINARY_PATH to get_current_binary_path, saving differences to new patch file
     file: str = patch_name.replace(' ', '-')
-    filepath = os.path.join(PATCHES_PATH, f"{file}.ps")
+    filepath = os.path.join(user_working_directory + PATCHES_PATH, f"{file}.ps")
 
     with open(filepath, "a+") as patch_file:
         patch_file.write(f'name = "{patch_name}"\n')
@@ -147,10 +148,14 @@ def save_patch(patch_name: str, description: str | None, patches: list[tuple]) -
 def main():
 
     global user_binary
+    global user_working_directory
     # grab args
     if len(sys.argv) != 2 or sys.argv[1] == "-h":
         print("Usage: patchpal <binary_file_to_reverse>")
+
     user_binary = sys.argv[1]
+    user_working_directory = os.path.dirname(os.path.abspath(user_binary))
+
     setup()
 
     diffs: list[tuple] | None = get_diff()
