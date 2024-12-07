@@ -114,7 +114,7 @@ def display_patches(): # reads in title/description info from each patch file an
 
     patch_choice = int(input("Input a number to select a patch: "))
     try:
-        return patch_choices[patch_choice]
+        return patch_choices[patch_choice-1]
     except Exception as e:
         return None
 
