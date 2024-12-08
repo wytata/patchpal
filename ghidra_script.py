@@ -41,7 +41,7 @@ def writeTomlFile(name, description, data, path, frame):
         #print(error_message)
         #error_label = JLabel(error_message)
         #panel.add(error_label)
-        return
+        return False
     offsets = [modification[0] for modification in data]
     bytes = [modification[1].split("->")[1].strip().strip("0x") for modification in data]
     output_bytes = ["'" + "0" + bytes[i] + "'" if len(bytes[i]) == 1 else "'" + bytes[i] + "'" for i in range(len(bytes))]
@@ -53,6 +53,7 @@ def writeTomlFile(name, description, data, path, frame):
     output_file.write("offsets = [" + ', '.join(offsets) + "]\n") 
     output_file.write("bytes = [" + ', '.join(output_bytes) + "]\n")
     output_file.close()
+    return True
 
 
 def acceptAllPatches(data, prog):
@@ -90,7 +91,9 @@ def acceptAllPatches(data, prog):
     def exportPatchesHandler(event):
     	name = nameInput.getText()
     	description = descriptionInput.getText()
-	writeTomlFile(name, description, data, prog.getExecutablePath(), patchExportFrame)
+	res = writeTomlFile(name, description, data, prog.getExecutablePath(), patchExportFrame)
+        if res:
+            patchExportFrame.setVisible(False)
 
     exportButton = JButton("Export Patches", actionPerformed=exportPatchesHandler)
     exportButton.setAlignmentX(panel.CENTER_ALIGNMENT)
