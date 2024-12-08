@@ -162,16 +162,17 @@ def display_patches(): # reads in title/description info from each patch file an
 
             print(str(i + 1) + ". " + name + "\n" + description + "\n\n-----\n\n")
 
-    patch_choice = input("Input a number to select a patch: ")
+    patch_choice = input("Input a number to select a patch (or q to quit): ")
     if patch_choice == 'q':
         exit()
     while not patch_choice.isnumeric():
-        patch_choice = input("Input a number to select a patch: ")
+        patch_choice = input("Input a number to select a patch (or q to quit): ")
         if patch_choice == 'q':
             exit()
 
     try:
-        return patch_choices[patch_choice-1]
+        print(patch_choices[int(patch_choice)-1])
+        return patch_choices[int(patch_choice)-1]
     except Exception as e:
         return None
 
@@ -185,12 +186,11 @@ def setup():
         return
 
     try:
-        absolute_file_path = os.path.abspath(user_binary)
-        directory = os.path.join(os.path.dirname(absolute_file_path), ".data")
+        directory = os.path.join(user_working_directory, ".data")
         os.mkdir(directory)
         os.mkdir(directory + "/patches")
         original_bin_path = directory + "/orig.bin"
-        shutil.copy(absolute_file_path, original_bin_path)
+        shutil.copy(user_binary, original_bin_path)
         print("Your patch pal project directory has been set up. You can now create patches!")
 
     except Exception as e:
@@ -219,8 +219,9 @@ def main():
     if len(sys.argv) != 2 or sys.argv[1] == "-h":
         print("Usage: patchpal <binary_file_to_reverse>")
 
-    user_binary = sys.argv[1]
-    user_working_directory = os.path.dirname(os.path.abspath(user_binary))
+    user_binary = os.path.abspath(sys.argv[1])
+    print("USER BINARY GIVEN: " + user_binary)
+    user_working_directory = os.path.dirname(user_binary)
 
     setup()
 
