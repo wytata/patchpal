@@ -15,4 +15,6 @@ After the first run, the user will be prompted to select a patch to apply to the
 modifications as a patch file in their project structure. This is the typical workflow for a reverser making direct modifications to their binary using programs such as radare2. For a Ghidra user, patch files can be generated through Ghidra,
 while the process of running the binary with patches is otherwise the same through the Patch Pal command line interface.
 
+Demonstrations of the tool can be found in the test directory, which contains example directories that show the project structure resulting from using the tool as well as videos in which the tool is used to create these directories.
+
 We hope you enjoy Patch Pal. Happy hacking!
