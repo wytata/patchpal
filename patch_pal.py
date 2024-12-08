@@ -60,37 +60,87 @@ def apply_patch(patch):
         patch (str): Path to the TOML patch file.
     """
     try:
+        # Ensure the patch file path is valid
+        if not patch or not isinstance(patch, (str, bytes, os.PathLike)):
+            print(f"Error: Invalid patch file path provided: {patch}")
+            return
+
+        # Ensure the patch file exists
+        if not os.path.isfile(patch):
+            print(f"Error: Patch file '{patch}' not found.")
+            return
+
         # Load the TOML file
         patch_data = None
-        with open(patch, "r") as patch_file:
-            patch_data = toml.load(patch_file)
+        try:
+            with open(patch, "r") as patch_file:
+                patch_data = toml.load(patch_file)
+        except toml.TomlDecodeError as e:
+            print(f"Error: Failed to parse the TOML file '{patch}' - {e}")
+            return
+        except Exception as e:
+            print(f"Error: Unable to open or read the patch file '{patch}' - {e}")
+            return
 
-        # Extract content section
+        # Extract patch metadata and content
         name = patch_data.get("name", "Unnamed Patch")
         description = patch_data.get("description", "No description provided.")
         content = patch_data.get("content", {})
         offsets = content.get("offsets", [])
         bytes_to_write = content.get("bytes", [])
 
-        if not offsets or not bytes_to_write or len(offsets) != len(bytes_to_write):
-            raise ValueError("Invalid content format: offsets and bytes must be non-empty lists of the same length.")
+        # Validate the content structure
+        if not isinstance(offsets, list) or not isinstance(bytes_to_write, list):
+            print("Error: 'offsets' and 'bytes' must be lists.")
+            return
+        if len(offsets) != len(bytes_to_write):
+            print("Error: 'offsets' and 'bytes' lists must be of the same length.")
+            return
+        if not offsets or not bytes_to_write:
+            print("Error: Patch content is empty or invalid.")
+            return
+
+        # Validate the binary file path
+        if not user_binary or not isinstance(user_binary, (str, bytes, os.PathLike)):
+            print(f"Error: Invalid binary file path provided: {user_binary}")
+            return
+
+        if not os.path.isfile(user_binary):
+            print(f"Error: The binary file '{user_binary}' does not exist.")
+            return
 
         # Open the current binary file in binary read/write mode
-        current_binary_path = user_binary
-        with open(current_binary_path, "r+b") as binary_file:
-            for offset, byte_string in zip(offsets, bytes_to_write):
-                # Convert offset and byte string
-                offset = int(offset)  # Ensure offset is an integer
-                byte_data = bytes.fromhex(byte_string)
+        try:
+            with open(user_binary, "r+b") as binary_file:
+                for offset, byte_string in zip(offsets, bytes_to_write):
+                    try:
+                        # Convert offset and byte string
+                        offset = int(offset)  # Ensure offset is an integer
+                        byte_data = bytes.fromhex(byte_string)  # Convert hex string to bytes
 
-                # Seek to the offset and write the byte data
-                binary_file.seek(offset)
-                binary_file.write(byte_data)
+                        # Check if the offset is within the file bounds
+                        binary_file.seek(0, os.SEEK_END)
+                        file_size = binary_file.tell()
+                        if offset < 0 or offset >= file_size:
+                            print(f"Warning: Offset {offset} is out of bounds for the binary file.")
+                            continue
+
+                        # Seek to the offset and write the byte data
+                        binary_file.seek(offset)
+                        binary_file.write(byte_data)
+                    except ValueError as ve:
+                        print(f"Error: Invalid offset or byte format in patch - {ve}")
+                    except Exception as e:
+                        print(f"Error: Failed to apply patch at offset {offset} - {e}")
+        except IOError as ioe:
+            print(f"Error: Unable to open or write to the binary file '{user_binary}' - {ioe}")
+            return
 
         print(f"Patch '{name}' applied successfully: {description}")
 
     except Exception as e:
-        print(f"Error applying patch: {e}")
+        print(f"An unexpected error occurred while applying the patch: {e}")
+
 
 def display_patches(): # reads in title/description info from each patch file and displays it
     if os.listdir(user_working_directory + PATCHES_PATH) == []:
